@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 @Component
 public class JwtTokenValidator {
 
@@ -28,6 +30,12 @@ public class JwtTokenValidator {
 	private final String publicKey;
 	// HUB Center
 	private final String tokenRequestHeader;
+
+
+	private String jwtSecret;
+
+
+	private int jwtExpirationMs;
 	// @Autowired
 	// public JwtTokenValidator(@Value("${app.jwt.publickey}") String publicKey) {
 	// this.publicKey = publicKey;
@@ -35,9 +43,11 @@ public class JwtTokenValidator {
 
 	@Autowired
 	public JwtTokenValidator(@Value("${app.jwt.publickey}") String publicKey,
-			@Value("${app.jwt.header.prefix}") String tokenRequestHeader) {
+			@Value("${app.jwt.header.prefix}") String tokenRequestHeader, @Value("${app.jwt.secret}") String jwtSecret, @Value("${app.jwt.expirationMs}") int jwtExpirationMs) {
 		this.publicKey = publicKey;
 		this.tokenRequestHeader = tokenRequestHeader;
+		this.jwtSecret = jwtSecret;
+		this.jwtExpirationMs = jwtExpirationMs;
 	}
 
 	/**
@@ -47,7 +57,7 @@ public class JwtTokenValidator {
 	 * 
 	 * @throws Exception
 	 */
-	public String validateToken(String authToken, String org_code) {
+	public String validateToken(String authToken) {
 		String userId = null;
 		String strKey = publicKey;
 		try {
@@ -76,6 +86,15 @@ public class JwtTokenValidator {
 			throw new InvalidTokenRequestException("JWT", authToken, "Illegal argument token");
 		}
 		return userId;
+	}
+
+	public String generateTokenFromUsername(String username) {
+		return Jwts.builder()
+				.setSubject(username)
+				.setIssuedAt(new Date())
+				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+				.signWith(SignatureAlgorithm.HS512, jwtSecret)
+				.compact();
 	}
 
 }

@@ -70,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			// Cookie[] cookies = request.getCookies();
 			// System.out.println("Extracted cookies: " + cookies);
 			String jwt = getJwtFromRequest(request);
-			String userId = jwtTokenValidator.validateToken(jwt, org_code != null ? org_code : "EVN");
+			String userId = jwtTokenValidator.validateToken(jwt);
 			if (StringUtils.hasText(jwt) && userId != null) {
 				// String userId = jwtTokenProvider.getUserIdFromJWT(jwt);
 
