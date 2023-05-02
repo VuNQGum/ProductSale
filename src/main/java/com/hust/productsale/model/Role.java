@@ -6,7 +6,8 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity(name = "auth_role")
+@Entity
+@Table(name = "auth_role")
 public class Role {
     @Id
     @Column(name = "ROLE_ID")

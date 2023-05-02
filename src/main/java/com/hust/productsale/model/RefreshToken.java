@@ -4,7 +4,8 @@ import java.time.Instant;
 
 import javax.persistence.*;
 
-@Entity(name = "refresh_token")
+@Entity
+@Table(name = "refresh_token")
 public class RefreshToken {
     @Id
     @Column(name = "id", nullable = false)

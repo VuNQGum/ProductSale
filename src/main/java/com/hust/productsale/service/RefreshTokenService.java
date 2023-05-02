@@ -7,8 +7,9 @@ import com.hust.productsale.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,8 +29,11 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByToken(token);
     }
 
+    @Transactional
     public RefreshToken createRefreshToken(String userId) {
         RefreshToken refreshToken = new RefreshToken();
+        // Delete all previous refresh_token
+        refreshTokenRepository.deleteByUserId(userId);
 
         refreshToken.setUser(userRepository.findById(userId).get());
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
@@ -48,8 +52,4 @@ public class RefreshTokenService {
         return token;
     }
 
-    @Transactional
-    public int deleteByUserId(String userId) {
-        return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
-    }
 }

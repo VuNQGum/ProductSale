@@ -10,7 +10,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity(name = "users_usr")
+@Entity
+@Table(name = "users_usr")
 public class User {
     private static final long serialVersionUID = 74597879236597717L;
 
@@ -47,6 +48,9 @@ public class User {
 
     @Column(name = "type_usr", insertable = true, updatable = true, nullable = true)
     private Short type;
+
+    @OneToOne(mappedBy = "user")
+    private RefreshToken refreshToken;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(name = "auth_user_authority", joinColumns = {
@@ -147,5 +151,13 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public RefreshToken getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(RefreshToken refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
