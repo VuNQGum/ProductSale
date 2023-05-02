@@ -39,9 +39,14 @@ public class CustomUserDetails extends User implements UserDetails {
         return true;
     }
 
+//    @Override
+//    public boolean isAccountNonLocked() {
+//        return super.getActive();
+//    }
+
     @Override
     public boolean isAccountNonLocked() {
-        return super.getActive();
+        return true;
     }
 
     @Override
@@ -49,9 +54,14 @@ public class CustomUserDetails extends User implements UserDetails {
         return true;
     }
 
+//    @Override
+//    public boolean isEnabled() {
+//        return super.getActive();
+//    }
+
     @Override
     public boolean isEnabled() {
-        return super.getActive();
+        return true;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.hust.productsale.bean;
 
-import com.hust.productsale.model.ApiResponse;
 import java.util.List;
 
 public class UserInfoResponse extends ApiResponse {

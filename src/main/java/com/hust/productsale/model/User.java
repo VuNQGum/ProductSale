@@ -2,9 +2,6 @@ package com.hust.productsale.model;
 
 import com.hust.productsale.validation.annotation.NullOrNotBlank;
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.NaturalId;
 
 import javax.validation.constraints.NotBlank;
@@ -14,9 +11,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity(name = "users_usr")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class User {
     private static final long serialVersionUID = 74597879236597717L;
 
@@ -27,12 +21,6 @@ public class User {
 
     @Column(name = "name_usr", length = 50)
     private String name;
-
-//    @Column(name = "NS_ID")
-//    private Long nsId;
-//
-//    @Column(name = "id_org_usr")
-//    private Integer donviId;
 
     @NaturalId
     @Column(name = "email_usr", unique = true)
@@ -51,8 +39,8 @@ public class User {
     @NullOrNotBlank(message = "Last name can not be blank")
     private Date updatedAt;
 
-    @Column(name = "usr_enabled", nullable = false)
-    private Boolean active;
+//    @Column(name = "usr_enabled")
+//    private Boolean active;
 
     @Column(name = "usr_token", nullable = false)
     private String usrToken;
@@ -60,26 +48,104 @@ public class User {
     @Column(name = "type_usr", insertable = true, updatable = true, nullable = true)
     private Short type;
 
-//    @Column(name = "Alias_CA", insertable = true, updatable = true, nullable = true)
-//    private String aliasCA;
-
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(name = "auth_user_authority", joinColumns = {
             @JoinColumn(name = "USER_ID", referencedColumnName = "id_usr") }, inverseJoinColumns = {
             @JoinColumn(name = "ROLE_ID", referencedColumnName = "ROLE_ID") })
     private Set<Role> roles = new HashSet<>();
 
+    public User() {
+    }
 
-	public User(User user) {
-            // id = user.getId(); firstName
-            name = user.getName();
-            username = user.getUsername();
+    public User(User user) {
+        username = user.getUsername();
+        if (user.getUsrToken() != null) {
+            password = user.getPassword() + "®®" + user.getUsrToken();
+        } else {
             password = user.getPassword();
-            email = user.getEmail();
-            active = user.getActive();
-            usrToken = user.getUsrToken();
-            roles = user.getRoles();
-//            nsId = user.getNsId();
-//            donviId = user.getDonviId();
+        }
+        email = user.getEmail();
+        usrToken = user.getUsrToken();
+        roles = user.getRoles();
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+//    public Boolean getActive() {
+//        return active;
+//    }
+//
+//    public void setActive(Boolean active) {
+//        this.active = active;
+//    }
+
+    public String getUsrToken() {
+        return usrToken;
+    }
+
+    public void setUsrToken(String usrToken) {
+        this.usrToken = usrToken;
+    }
+
+    public Short getType() {
+        return type;
+    }
+
+    public void setType(Short type) {
+        this.type = type;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }

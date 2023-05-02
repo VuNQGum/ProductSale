@@ -57,7 +57,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // auth.userDetailsService(userDetailsService).passwordEncoder(new
         // EVNPasswordEncoder(userDetailsService.getLdapRepository()));
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-        auth.inMemoryAuthentication().withUser("admin").password("password").roles("ADMIN");
     }
 
     @Override

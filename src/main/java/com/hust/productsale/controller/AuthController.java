@@ -1,13 +1,17 @@
 package com.hust.productsale.controller;
 
 import com.hust.productsale.bean.SignInResponse;
+import com.hust.productsale.bean.TokenRefreshResponse;
 import com.hust.productsale.bean.UserInfoResponse;
-import com.hust.productsale.model.ApiResponse;
+import com.hust.productsale.bean.ApiResponse;
+import com.hust.productsale.exception.TokenRefreshException;
 import com.hust.productsale.model.CustomUserDetails;
+import com.hust.productsale.model.RefreshToken;
 import com.hust.productsale.model.payload.LoginRequest;
+import com.hust.productsale.model.payload.TokenRefreshRequest;
 import com.hust.productsale.security.JwtTokenValidator;
+import com.hust.productsale.service.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,8 +42,11 @@ public class AuthController {
     @Autowired
     UserDetailsService userDetailsService;
 
-    @Value("${app.jwt.authType}")
-    private String tokenRequestauthType;
+    @Autowired
+    RefreshTokenService refreshTokenService;
+
+//    @Value("${app.jwt.authType}")
+//    private String tokenRequestauthType;
 
     @PostMapping("/sign-in")
     @PreAuthorize("permitAll()")
@@ -56,18 +63,26 @@ public class AuthController {
                         .map(item -> item.getAuthority())
                         .collect(Collectors.toList());
 
-                return ResponseEntity.ok().body(new SignInResponse(jwtUtils.generateTokenFromUsername(userDetails.getUsername()),
+            int expiration = loginRequest.getExpiration().intValue();
+            int maxAge = expiration == 0 ? 30 : expiration;
+
+            String userId = loginRequest.getUserId();
+            String accessToken = jwtUtils.generateTokenFromUsername(userDetails.getUsername());
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
+
+                return ResponseEntity.ok().body(new SignInResponse(accessToken,
                         new UserInfoResponse(userDetails.getUsername(), userDetails.getName(),
-                                roles, true, ""), true, "Đăng nhập thành công"));
+                                roles, true, ""), refreshToken.getToken(), true, "Đăng nhập thành công"));
 //            } else {
 //                return ResponseEntity.ok().body(new SignInResponse(null, null, 0, "Đăng nhập lỗi"));
 //            }
         } catch (Exception e) {
 
-            return ResponseEntity.ok().body(new SignInResponse(null, null, false, "Đăng nhập lỗi"));
+            return ResponseEntity.ok().body(new SignInResponse(null, null, null, false, "Đăng nhập lỗi"));
         }
 
     }
+
 
     @PostMapping("/sign-in-token")
     @PreAuthorize("permitAll()")
@@ -89,16 +104,16 @@ public class AuthController {
                 List<String> roles = userDetails.getAuthorities().stream()
                         .map(item -> item.getAuthority())
                         .collect(Collectors.toList());
-
+                RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
                 return ResponseEntity.ok().body(new SignInResponse(jwtUtils.generateTokenFromUsername(userDetailsImpl.getUsername()),
                         new UserInfoResponse(userDetailsImpl.getUsername(), userDetails.getUsername(),
-                                roles, true, ""), true, "Đăng nhập thành công"));
+                                roles, true, ""), refreshToken.getToken(), true, "Đăng nhập thành công"));
 
             } else {
-                return ResponseEntity.ok().body(new SignInResponse(null, null, false, "Đăng nhập lỗi"));
+                return ResponseEntity.ok().body(new SignInResponse(null, null, null, false, "Đăng nhập lỗi"));
             }
         } catch (AuthenticationException e) {
-            return ResponseEntity.ok().body(new SignInResponse(null, null, false, "Token không tồn tại"));
+            return ResponseEntity.ok().body(new SignInResponse(null, null, null, false, "Token không tồn tại"));
         }
     }
 
@@ -107,5 +122,20 @@ public class AuthController {
         //ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
         return ResponseEntity.ok()
                 .body(new ApiResponse(true, "Bạn đã thoát!"));
+    }
+
+    @PostMapping("/refreshtoken")
+    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+                        "Refresh token is not in database!"));
     }
 }

@@ -43,7 +43,7 @@ public class JwtTokenValidator {
 
 	@Autowired
 	public JwtTokenValidator(@Value("${app.jwt.publickey}") String publicKey,
-			@Value("${app.jwt.header.prefix}") String tokenRequestHeader, @Value("${app.jwt.secret}") String jwtSecret, @Value("${app.jwt.expirationMs}") int jwtExpirationMs) {
+			@Value("${app.jwt.header.prefix}") String tokenRequestHeader, @Value("${app.jwt.privatekey}") String jwtSecret, @Value("${app.jwt.expirationMs}") int jwtExpirationMs) {
 		this.publicKey = publicKey;
 		this.tokenRequestHeader = tokenRequestHeader;
 		this.jwtSecret = jwtSecret;

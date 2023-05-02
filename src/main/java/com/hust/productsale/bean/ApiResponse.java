@@ -1,4 +1,4 @@
-package com.hust.productsale.model;
+package com.hust.productsale.bean;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
