@@ -30,7 +30,7 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public RefreshToken createRefreshToken(String userId) {
+    public RefreshToken createRefreshToken(Long userId) {
         RefreshToken refreshToken = new RefreshToken();
         // Delete all previous refresh_token
         refreshTokenRepository.deleteByUserId(userId);

@@ -68,7 +68,7 @@ public class AuthController {
 
             String userId = loginRequest.getUserId();
             String accessToken = jwtUtils.generateTokenFromUsername(userDetails.getUsername());
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
                 return ResponseEntity.ok().body(new SignInResponse(accessToken,
                         new UserInfoResponse(userDetails.getUsername(), userDetails.getName(),
@@ -89,8 +89,8 @@ public class AuthController {
     public ResponseEntity<?> authenticateUserToken(@Valid @RequestBody Map<String, Object> loginRequest) {
         try {
             String token = loginRequest.get("accessToken").toString();
-            if (token != null) {
-                String username = jwtUtils.validateToken(token);
+            if (token != null && jwtUtils.validateToken(token)) {
+                String username = jwtUtils.getUsernameFromJWT(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 UsernamePasswordAuthenticationToken authentication
@@ -104,7 +104,7 @@ public class AuthController {
                 List<String> roles = userDetails.getAuthorities().stream()
                         .map(item -> item.getAuthority())
                         .collect(Collectors.toList());
-                RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
+                RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetailsImpl.getId());
                 return ResponseEntity.ok().body(new SignInResponse(jwtUtils.generateTokenFromUsername(userDetailsImpl.getUsername()),
                         new UserInfoResponse(userDetailsImpl.getUsername(), userDetails.getUsername(),
                                 roles, true, ""), refreshToken.getToken(), true, "Đăng nhập thành công"));

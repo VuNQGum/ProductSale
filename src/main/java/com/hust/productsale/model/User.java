@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -16,7 +17,11 @@ public class User {
     private static final long serialVersionUID = 74597879236597717L;
 
     @Id
-    @Column(name = "id_usr", unique = true)
+    @Column(name = "id_usr")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "user_name", unique = true)
     @NullOrNotBlank(message = "Username can not be blank")
     private String username;
 
@@ -34,14 +39,14 @@ public class User {
 
     @Column(name = "date_create")
     @NullOrNotBlank(message = "Last name can not be blank")
-    private Date createdAt;
+    private Date createdAt = new Date();
 
     @Column(name = "date_update")
     @NullOrNotBlank(message = "Last name can not be blank")
-    private Date updatedAt;
+    private Date updatedAt = new Date();
 
-//    @Column(name = "usr_enabled")
-//    private Boolean active;
+    @Column(name = "usr_enabled", columnDefinition = "TINYINT(1)")
+    private Boolean active = true;
 
     @Column(name = "usr_token", nullable = false)
     private String usrToken;
@@ -58,10 +63,45 @@ public class User {
             @JoinColumn(name = "ROLE_ID", referencedColumnName = "ROLE_ID") })
     private Set<Role> roles = new HashSet<>();
 
+    @Column(name = "gender")
+    private Short gender;
+
+    @Column(name = "birth_day")
+    private Date birthday;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "province")
+    private String province;
+
+    @Column(name = "ward")
+    private String ward;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "avatar")
+    private String avatar;
+
+    @Column(name = "is_anonymous")
+    private Boolean anonymous;
+
+    @OneToMany(mappedBy = "address", fetch = FetchType.LAZY)
+    private List<User> employee;
+
+    @ManyToOne
+    @JoinColumn(name = "manager_id")
+    private User manager;
+
     public User() {
     }
 
     public User(User user) {
+        id = user.getId();
         username = user.getUsername();
         if (user.getUsrToken() != null) {
             password = user.getPassword() + "®®" + user.getUsrToken();
@@ -71,6 +111,14 @@ public class User {
         email = user.getEmail();
         usrToken = user.getUsrToken();
         roles = user.getRoles();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -121,13 +169,13 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-//    public Boolean getActive() {
-//        return active;
-//    }
-//
-//    public void setActive(Boolean active) {
-//        this.active = active;
-//    }
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 
     public String getUsrToken() {
         return usrToken;
@@ -159,5 +207,93 @@ public class User {
 
     public void setRefreshToken(RefreshToken refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public Short getGender() {
+        return gender;
+    }
+
+    public void setGender(Short gender) {
+        this.gender = gender;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getWard() {
+        return ward;
+    }
+
+    public void setWard(String ward) {
+        this.ward = ward;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public Boolean getAnonymous() {
+        return anonymous;
+    }
+
+    public void setAnonymous(Boolean anonymous) {
+        this.anonymous = anonymous;
+    }
+
+    public List<User> getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(List<User> employee) {
+        this.employee = employee;
+    }
+
+    public User getManager() {
+        return manager;
+    }
+
+    public void setManager(User manager) {
+        this.manager = manager;
     }
 }

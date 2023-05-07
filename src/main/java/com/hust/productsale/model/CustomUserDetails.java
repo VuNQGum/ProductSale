@@ -25,6 +25,9 @@ public class CustomUserDetails extends User implements UserDetails {
     }
 
     @Override
+    public Long getId() {return super.getId();}
+
+    @Override
     public String getPassword() {
         return super.getPassword();
     }
@@ -39,30 +42,30 @@ public class CustomUserDetails extends User implements UserDetails {
         return true;
     }
 
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return super.getActive();
-//    }
-
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return super.getActive();
     }
+
+//    @Override
+//    public boolean isAccountNonLocked() {
+//        return true;
+//    }
 
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
-//    @Override
-//    public boolean isEnabled() {
-//        return super.getActive();
-//    }
-
     @Override
     public boolean isEnabled() {
-        return true;
+        return super.getActive();
     }
+
+//    @Override
+//    public boolean isEnabled() {
+//        return true;
+//    }
 
     @Override
     public String getUsrToken() {

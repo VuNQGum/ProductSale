@@ -32,10 +32,10 @@ public class JwtTokenValidator {
 	private final String tokenRequestHeader;
 
 
-	private String jwtSecret;
+	private final String jwtSecret;
 
 
-	private int jwtExpirationMs;
+	private final int jwtExpirationMs;
 	// @Autowired
 	// public JwtTokenValidator(@Value("${app.jwt.publickey}") String publicKey) {
 	// this.publicKey = publicKey;
@@ -57,14 +57,12 @@ public class JwtTokenValidator {
 	 * 
 	 * @throws Exception
 	 */
-	public String validateToken(String authToken) {
-		String userId = null;
-		String strKey = publicKey;
+	public boolean validateToken(String authToken) {
 		try {
-			// Jwts.parser().setSigningKey(RSAKey.getPublicKey(publicKey)).parseClaimsJws(authToken);
-			Claims claims = Jwts.parser().setSigningKey(RSAKey.getPublicKey(strKey)).parseClaimsJws(authToken)
-					.getBody();
-			userId = claims.getSubject();
+			 Jwts.parser().setSigningKey(RSAKey.getPublicKey(publicKey)).parseClaimsJws(authToken);
+//			Claims claims = Jwts.parser().setSigningKey(RSAKey.getPublicKey(strKey)).parseClaimsJws(authToken)
+//					.getBody();
+
 		} catch (SignatureException ex) {
 			logger.error("Invalid JWT signature");
 			throw new InvalidTokenRequestException("JWT", authToken, "Incorrect signature");
@@ -85,7 +83,7 @@ public class JwtTokenValidator {
 			logger.error("JWT claims string is empty.");
 			throw new InvalidTokenRequestException("JWT", authToken, "Illegal argument token");
 		}
-		return userId;
+		return true;
 	}
 
 	public String generateTokenFromUsername(String username) {
@@ -93,8 +91,13 @@ public class JwtTokenValidator {
 				.setSubject(username)
 				.setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-				.signWith(SignatureAlgorithm.HS512, jwtSecret)
+				.signWith(SignatureAlgorithm.RS256, RSAKey.getPrivateKey(jwtSecret))
 				.compact();
 	}
 
+	public String getUsernameFromJWT(String token) {
+		Claims claims = Jwts.parser().setSigningKey(RSAKey.getPrivateKey(jwtSecret)).parseClaimsJws(token).getBody();
+
+		return claims.getSubject();
+	}
 }

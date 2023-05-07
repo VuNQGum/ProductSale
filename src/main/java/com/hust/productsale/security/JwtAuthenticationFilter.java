@@ -70,11 +70,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			// Cookie[] cookies = request.getCookies();
 			// System.out.println("Extracted cookies: " + cookies);
 			String jwt = getJwtFromRequest(request);
-			String userId = jwtTokenValidator.validateToken(jwt);
-			if (StringUtils.hasText(jwt) && userId != null) {
-				// String userId = jwtTokenProvider.getUserIdFromJWT(jwt);
 
-				UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+			if (StringUtils.hasText(jwt) && jwtTokenValidator.validateToken(jwt)) {
+				 String userId = jwtTokenValidator.getUsernameFromJWT(jwt);
+
+				UserDetails userDetails = customUserDetailsService.loadUserByUsername(userId);
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 						userDetails, jwt, userDetails.getAuthorities());
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
