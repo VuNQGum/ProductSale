@@ -14,13 +14,15 @@ public class ApiResponse {
 	private final String timestamp;
 	private final String cause;
 	private final String path;
+	private final String message;
 
-	public ApiResponse(Boolean state, Object data, String cause, String path) {
+	public ApiResponse(Boolean state, Object data, String cause, String path, String message) {
 		this.timestamp = Instant.now().toString();
 		this.data = data;
 		this.state = state;
 		this.cause = cause;
 		this.path = path;
+		this.message = message;
 	}
 
 	public ApiResponse(Boolean state, Object data) {
@@ -29,6 +31,15 @@ public class ApiResponse {
 		this.state = state;
 		this.cause = null;
 		this.path = null;
+		this.message = null;
 	}
 
+	public ApiResponse(Boolean state, Object data, String message) {
+		this.timestamp = Instant.now().toString();
+		this.data = data;
+		this.state = state;
+		this.cause = null;
+		this.path = null;
+		this.message = message;
+	}
 }

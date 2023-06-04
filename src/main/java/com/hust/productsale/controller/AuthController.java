@@ -7,9 +7,12 @@ import com.hust.productsale.bean.ApiResponse;
 import com.hust.productsale.exception.TokenRefreshException;
 import com.hust.productsale.model.CustomUserDetails;
 import com.hust.productsale.model.RefreshToken;
+import com.hust.productsale.model.User;
 import com.hust.productsale.model.payload.LoginRequest;
+import com.hust.productsale.model.payload.SignUpRequest;
 import com.hust.productsale.model.payload.TokenRefreshRequest;
 import com.hust.productsale.security.JwtTokenValidator;
+import com.hust.productsale.service.AuthService;
 import com.hust.productsale.service.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +47,9 @@ public class AuthController {
 
     @Autowired
     RefreshTokenService refreshTokenService;
+
+    @Autowired
+    AuthService authService;
 
 //    @Value("${app.jwt.authType}")
 //    private String tokenRequestauthType;
@@ -137,5 +143,11 @@ public class AuthController {
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
                         "Refresh token is not in database!"));
+    }
+
+    @PostMapping("/sign-up")
+    public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request) {
+        User user = authService.signUp(request);
+        return ResponseEntity.ok(new ApiResponse(true, user));
     }
 }

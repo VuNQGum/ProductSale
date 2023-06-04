@@ -48,7 +48,7 @@ public class User {
     @Column(name = "usr_enabled", columnDefinition = "TINYINT(1)")
     private Boolean active = true;
 
-    @Column(name = "usr_token", nullable = false)
+    @Column(name = "usr_token")
     private String usrToken;
 
     @Column(name = "type_usr", insertable = true, updatable = true, nullable = true)
